@@ -16,6 +16,7 @@ public class TwitterController extends Controller {
 	
 	private static String apiKey = Play.application().configuration().getString("twitter.apiKey");
 	private static String apiSecret = Play.application().configuration().getString("twitter.apiSecret");
+	private static String callbackUrl = Play.application().configuration().getString("twitter.callbackUrl");
 	
 	public static String login(){
 		try {
