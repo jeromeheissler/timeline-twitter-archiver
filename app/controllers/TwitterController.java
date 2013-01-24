@@ -22,7 +22,7 @@ public class TwitterController extends Controller {
 		try {
 			OAuthService service = new ServiceBuilder()
 				.provider(TwitterApi.class)
-				.callback("http://localhost:9000/twitter/callback")
+				.callback(callbackUrl+"/twitter/callback")
 				.apiKey(apiKey)
 				.apiSecret(apiSecret)
 				.build();
@@ -40,7 +40,7 @@ public class TwitterController extends Controller {
 	public static Result callback(){
 		OAuthService service = new ServiceBuilder()
 			.provider(TwitterApi.class)
-			.callback("http://localhost:9000/twitter/callback")
+			.callback(callbackUrl+"/twitter/callback")
 			.apiKey(apiKey)
 			.apiSecret(apiSecret)
 			.build();
@@ -51,22 +51,32 @@ public class TwitterController extends Controller {
 		Token accessToken = service.getAccessToken(requestToken, v);
 		String token = accessToken.getToken();
 		String tokenSecret = accessToken.getSecret();
-		//session().put("twitter_token",token);
-		//session().put("twitter_token_secret", tokenSecret);
+		session().put("twitter_token",token);
+		session().put("twitter_token_secret", tokenSecret);
 		  
 		OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.twitter.com/1/account/verify_credentials.json");
 		service.signRequest(accessToken, request);
 		Response response = request.send();
 		JsonNode result = Json.parse(response.getBody());
 		
-		UserModel user = new UserModel(result.get("id").asText());
-		user.insert();
+		UserModel user = UserModel.findByTwitterId(result.get("id").asText());
+		if(user == null)	{
+			user = new UserModel(result.get("id").asText());
+			user.insert();
+		}
 		
-		TwitterModel twitter = new TwitterModel();
-		twitter.setUser(user);
-		twitter.setToken(token);
-		twitter.setTokenSecret(tokenSecret);
-		twitter.insert();
+		TwitterModel twitter = TwitterModel.findByTwitterUser(user);
+		if(twitter == null)	{
+			twitter = new TwitterModel();
+			twitter.setUser(user);
+			twitter.setToken(token);
+			twitter.setTokenSecret(tokenSecret);
+			twitter.insert();
+		}else	{
+			twitter.setToken(token);
+			twitter.setTokenSecret(tokenSecret);
+			twitter.update();
+		}
 			  
 		response().setCookie("oauthState","1");
 		session().put("twitterId", result.get("id").asText());

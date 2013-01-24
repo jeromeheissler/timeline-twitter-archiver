@@ -34,14 +34,21 @@ public class Application extends Controller {
 	public static String since_id = null;
 	
 	public static Result index() {
-		String twitOAuth = TwitterController.login();
-		play.Logger.debug(twitOAuth);
-		return ok(index.render(twitOAuth));
+		if(!session().containsKey("twitterId"))	{	
+			String twitOAuth = TwitterController.login();
+			play.Logger.debug(twitOAuth);
+			return ok(index.render(twitOAuth));
+		}else	{
+			return redirect("/loadtimeline");
+		}
 	}
 	
 	public static Result loadtimeline()	{
-		if(!session().containsKey("twitterId") || UserModel.findByTwitterId(session().get("twitterId")) == null)
+		if(!session().containsKey("twitterId") || UserModel.findByTwitterId(session().get("twitterId")) == null)	{
+			session().clear();
+			response().setCookie("oauthState","0");
 			return redirect("/");
+		}
 		
 		UserModel user = UserModel.findByTwitterId(session().get("twitterId"));
 		try {
@@ -49,13 +56,17 @@ public class Application extends Controller {
 			return ok(timeline.render(json.get("name").asText()));
 		} catch (UserNotFoundTwitterRestApiException e) {
 			play.Logger.error(e.toString());
+			session().clear();
 			return redirect("/");
 		}
 	}
 	
 	public static Result loadTweet()	{
-		if(!session().containsKey("twitterId") || UserModel.findByTwitterId(session().get("twitterId")) == null)
+		if(!session().containsKey("twitterId") || UserModel.findByTwitterId(session().get("twitterId")) == null)	{
+			session().clear();
+			response().setCookie("oauthState","0");
 			return redirect("/");
+		}
 		TweetModel tweet;
 		JsonNode json;
 		
@@ -70,6 +81,8 @@ public class Application extends Controller {
 			else
 				json = TwitterRestApi.homeTimeLine(user, 200);
 		} catch (UserNotFoundTwitterRestApiException e) {
+			session().clear();
+			response().setCookie("oauthState","0");
 			play.Logger.error(e.toString());
 			return redirect("/");
 		}
