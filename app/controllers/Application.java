@@ -34,16 +34,9 @@ public class Application extends Controller {
 	public static String since_id = null;
 	
 	public static Result index() {
-		List<TwitterModel> lst = TwitterModel.all();
-		if(lst.size() == 0)	{	
-			String twitOAuth = TwitterController.login();
-			play.Logger.debug(twitOAuth);
-			return ok(index.render(twitOAuth));
-		}else	{
-			response().setCookie("oauthState","1");
-			session().put("twitterId", lst.get(0).getTwitterId());	
-			return redirect("/loadtimeline");
-		}
+		String twitOAuth = TwitterController.login();
+		play.Logger.debug(twitOAuth);
+		return ok(index.render(twitOAuth));
 	}
 	
 	public static Result loadtimeline()	{
