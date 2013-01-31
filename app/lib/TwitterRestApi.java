@@ -27,7 +27,6 @@ public abstract class TwitterRestApi {
 	private static String baseSearch = "search/tweets.json?";
 	private static String userTimeLine = "statuses/user_timeline.json?include_rts=true";
 	private static String homeTimeLine = "https://api.twitter.com/1.1/statuses/home_timeline.json";
-	private static String share = "https://api.twitter.com/1/statuses/update.json";
 	private static String userInfo = "http://api.twitter.com/1.1/users/show.json";
 	
 	public static JsonNode search(UserModel user, String query) throws UserNotFoundTwitterRestApiException	{

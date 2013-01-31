@@ -18,6 +18,7 @@ import static leodagdag.play2morphia.MorphiaPlugin.ds;
 import static play.libs.F.Tuple;
 
 public class Model {
+	@SuppressWarnings("unused")
 	private static String fieldName;
 
 	// -- Magic to dynamically access the @Id property
@@ -111,6 +112,7 @@ public class Model {
 	 */
 	public static class Finder<I, T extends Model> extends QueryImpl<T> {
 
+		@SuppressWarnings("unused")
 		private final Class<I> idType;
 		private final Class<T> type;
 

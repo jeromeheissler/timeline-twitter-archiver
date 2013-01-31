@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,10 +17,8 @@ import org.codehaus.jackson.node.ObjectNode;
 import lib.TwitterRestApi;
 import lib.UserNotFoundTwitterRestApiException;
 import lib.models.TweetModel;
-import lib.models.TwitterModel;
 import lib.models.UserModel;
 
-import play.*;
 import play.libs.Json;
 import play.mvc.*;
 
@@ -33,6 +30,9 @@ public class Application extends Controller {
 	public static Date dmax = null;
 	public static String since_id = null;
 	
+	/**
+	 * The index of site
+	 */
 	public static Result index() {
 		if(!session().containsKey("twitterId"))	{	
 			String twitOAuth = TwitterController.login();
@@ -43,6 +43,9 @@ public class Application extends Controller {
 		}
 	}
 	
+	/**
+	 * Main page wich load all tweet
+	 */
 	public static Result loadtimeline()	{
 		if(!session().containsKey("twitterId") || UserModel.findByTwitterId(session().get("twitterId")) == null)	{
 			session().clear();
